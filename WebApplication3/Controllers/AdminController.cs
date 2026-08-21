@@ -230,7 +230,7 @@ namespace ReservationSystem.Controllers
                         .ToDictionary(t => t.Id, t => t.Name);
                 }
                 view.AddRange(reservations.Select(res => new EditReservationView()
-                { Id = res.Id, Name = users[res.UserId]  ,Date = res.Date, Table = res.Table.Number, Time = res.Time.StartTime })
+                { Id = res.Id, Name = users.ContainsKey(res.UserId) ? users[res.UserId] : res.UserId, Date = res.Date, Table = res.Table.Number, Time = res.Time.StartTime })
                 .OrderBy(x => x.Date)
                 .ThenBy(x => x.Table)
                 .ThenBy(x => x.Time));
@@ -244,8 +244,11 @@ namespace ReservationSystem.Controllers
             {
                 var reservationModel = _repository.Get<ReservationModel, int>(uow, (r => r.Id == id), (r => r.Id)).FirstOrDefault();
 
-                _repository.Delete<ReservationModel>(uow, reservationModel);
-                uow.SaveChanges();
+                if (reservationModel != null)
+                {
+                    _repository.Delete<ReservationModel>(uow, reservationModel);
+                    uow.SaveChanges();
+                }
             }
 
             return RedirectToAction("CancelReservation", "Admin");
