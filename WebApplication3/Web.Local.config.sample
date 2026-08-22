@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+  TEMPLATE for local development secrets/overrides.
+
+  HOW TO USE:
+    1. Copy this file to "Web.Local.config" (same folder, next to Web.config).
+    2. Fill in the values you need locally.
+    3. Web.Local.config is git-ignored, so your secrets never get committed.
+
+  This is the .NET Framework equivalent of appsettings.Development.json: the root <appSettings>
+  element below is merged into (and overrides) the <appSettings> in Web.config via the
+  file="Web.Local.config" attribute. Keys you don't set here simply fall back to Web.config.
+
+  NOTE: only <appSettings> can be overridden this way. To use a different local database, edit the
+  <connectionStrings> entry in Web.config directly (the default already points at LocalDB).
+  In PROD these values come from Azure App Service > Configuration instead of this file.
+-->
+<appSettings>
+  <!-- Gmail App Password (16 chars, no spaces) - see EmailController. Required for email to send. -->
+  <add key="smtpPassword" value="REPLACE_WITH_GMAIL_APP_PASSWORD" />
+
+  <!-- Optional: only if you exercise Azure Storage locally (unused by the app today). -->
+  <!-- <add key="reservationsystem_AzureStorageConnectionString" value="DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net" /> -->
+</appSettings>
