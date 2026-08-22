@@ -66,7 +66,15 @@ namespace ReservationSystem.Models
     {
         [Required]
         [Display(Name = "Jméno")]
-        public string Name { get; set; }
+        public string FirstName { get; set; }
+
+        [Required]
+        [Display(Name = "Příjmení")]
+        public string LastName { get; set; }
+
+        [Phone]
+        [Display(Name = "Telefon")]
+        public string PhoneNumber { get; set; }
 
         [Required]
         [EmailAddress]

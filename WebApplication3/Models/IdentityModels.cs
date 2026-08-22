@@ -14,6 +14,16 @@ namespace ReservationSystem.Models
         [Required]
         public string Name { get; set; }
 
+        // Contact details (item 3). Nullable so existing accounts are unaffected until edited.
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        // PhoneNumber is already provided by IdentityUser.
+
+        // Approval flag (item 2): new users start inactive and must be enabled by an admin.
+        public bool IsActive { get; set; }
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType

@@ -98,9 +98,23 @@
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
         <script src="~/Scripts/jquery-ui.multidatespicker.js" ></script>
         <script type="text/javascript">
+            function keepViewOnSelectedMonth(dateText, inst) {
+                // MultiDatesPicker (via jQuery UI) resets the shown month back to the
+                // default/current month after every pick when the input holds several
+                // dates. Pin the view to the month of the date just clicked so selecting
+                // multiple days across months no longer jumps back to the current month.
+                if (!inst) return;
+                var selected = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay || 1);
+                $(this).datepicker("option", "defaultDate", selected);
+                inst.drawMonth = inst.selectedMonth;
+                inst.drawYear = inst.selectedYear;
+                $.datepicker._updateDatepicker(inst);
+            }
+
             $(function() {
                 $("#groupDateDatePicker").multiDatesPicker(
                     {
+                        onSelect: keepViewOnSelectedMonth,
                         beforeShowDay: $.datepicker.noWeekends,
                         dateFormat: "dd.mm.yy",
                         dayNamesShort: ["Ne, Po, Út, St, Čt, Pá, So"],
@@ -113,6 +127,7 @@
 
                 $("#canncelledGroupDateDatePicker").multiDatesPicker(
                 {
+                    onSelect: keepViewOnSelectedMonth,
                     beforeShowDay: $.datepicker.noWeekends,
                     dateFormat: "dd.mm.yy",
                     dayNamesShort: ["Ne, Po, Út, St, Čt, Pá, So"],

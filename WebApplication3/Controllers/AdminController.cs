@@ -110,16 +110,36 @@ namespace ReservationSystem.Controllers
             }
 
             using (var appContext = new ApplicationDbContext())
-            { 
-                var userStore = new UserStore<ApplicationUser>(appContext);
-                var userManager = new UserManager<ApplicationUser>(userStore);
-                model.Users = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>().Users.
-                    Select(u => new MyUser {Id = u.Id, Email = u.Email, UserName = u.UserName, Name = u.Name}).ToList();
-
-                foreach (var user in model.Users)
+            {
+                // Load the set of Admin user ids once, instead of calling IsInRole per user.
+                // The old per-user IsInRole call caused one DB round-trip for every user (N+1),
+                // which is what made this page crawl as the user list grew.
+                var adminUserIds = new HashSet<string>();
+                var adminRole = appContext.Roles.FirstOrDefault(r => r.Name == "Admin");
+                if (adminRole != null)
                 {
-                    user.IsAdmin = userManager.IsInRole(user.Id, "Admin");
+                    foreach (var userRole in adminRole.Users)
+                    {
+                        adminUserIds.Add(userRole.UserId);
+                    }
                 }
+
+                model.Users = appContext.Users
+                    .Select(u => new { u.Id, u.Email, u.UserName, u.Name, u.FirstName, u.LastName, u.PhoneNumber, u.IsActive })
+                    .ToList()
+                    .Select(u => new MyUser
+                    {
+                        Id = u.Id,
+                        Email = u.Email,
+                        UserName = u.UserName,
+                        Name = u.Name,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
+                        PhoneNumber = u.PhoneNumber,
+                        IsActive = u.IsActive,
+                        IsAdmin = adminUserIds.Contains(u.Id)
+                    })
+                    .ToList();
             }
 
             return View("Settings", model);
@@ -212,6 +232,22 @@ namespace ReservationSystem.Controllers
                     userManager.AddToRole(id, "Admin");
 
                 appContext.SaveChanges();
+            }
+            return RedirectToAction("Settings");
+        }
+
+        public ActionResult ChangeActive(string id, bool wasActive)
+        {
+            // Enable/disable a user account (item 2). Inactive users cannot log in and show up
+            // as pending in the admin settings page until an admin activates them here.
+            using (var appContext = new ApplicationDbContext())
+            {
+                var user = appContext.Users.FirstOrDefault(u => u.Id == id);
+                if (user != null)
+                {
+                    user.IsActive = !wasActive;
+                    appContext.SaveChanges();
+                }
             }
             return RedirectToAction("Settings");
         }
@@ -382,12 +418,19 @@ namespace ReservationSystem.Controllers
                 _repository.Add(uow, dateRange);
                 uow.SaveChanges();
 
-                var dateRangeId = _repository.GetAll<DateRangeModel>(uow).First(dr => dr.Name.Equals(name)).Id;
-                var t1800 = _repository.GetAll<TimeModel>(uow).First(item => item.StartTime == new TimeSpan(18, 0, 0));
-                var t2100 = _repository.GetAll<TimeModel>(uow).First(item => item.StartTime == new TimeSpan(21, 0, 0));
-                var t2000 = _repository.GetAll<TimeModel>(uow).First(item => item.StartTime == new TimeSpan(20, 0, 0));
-                var t1830 = _repository.GetAll<TimeModel>(uow).First(item => item.StartTime == new TimeSpan(18, 30, 0));
-                var t2130 = _repository.GetAll<TimeModel>(uow).First(item => item.StartTime == new TimeSpan(21, 30, 0));
+                _repository.Add(uow, dateRange);
+                uow.SaveChanges();
+
+                // Id is populated on the tracked entity after SaveChanges - no need to re-query by name.
+                var dateRangeId = dateRange.Id;
+
+                // Load the times once instead of scanning the TimeModel table five separate times.
+                var times = _repository.GetAll<TimeModel>(uow).ToList();
+                var t1800 = times.First(item => item.StartTime == new TimeSpan(18, 0, 0));
+                var t2100 = times.First(item => item.StartTime == new TimeSpan(21, 0, 0));
+                var t2000 = times.First(item => item.StartTime == new TimeSpan(20, 0, 0));
+                var t1830 = times.First(item => item.StartTime == new TimeSpan(18, 30, 0));
+                var t2130 = times.First(item => item.StartTime == new TimeSpan(21, 30, 0));
 
                 MakeDaysOfWeekForDateRange(uow, dateRangeId, t1800, t2100, t2000, t1830, t2130);
 
