@@ -96,7 +96,7 @@
             <th>Povolit/Zakázat</th>
             <th>Smazat</th>
         </tr>
-        @foreach (var item in Model.Users.OrderBy(u => u.IsActive).ThenBy(u => u.LastName))
+        @foreach (var item in Model.Users.OrderByDescending(u => u.IsAdmin).ThenBy(u => string.IsNullOrEmpty(u.LastName) ? u.Name : u.LastName).ThenBy(u => u.FirstName))
         {
             <tr class="@(item.IsActive ? "" : "warning")">
                 <td>@(string.IsNullOrEmpty(item.FirstName) ? item.Name : item.FirstName)</td>
