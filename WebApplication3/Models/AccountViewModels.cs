@@ -72,6 +72,7 @@ namespace ReservationSystem.Models
         [Display(Name = "Příjmení")]
         public string LastName { get; set; }
 
+        [Required(ErrorMessage = "Telefon je povinný")]
         [Phone]
         [Display(Name = "Telefon")]
         public string PhoneNumber { get; set; }

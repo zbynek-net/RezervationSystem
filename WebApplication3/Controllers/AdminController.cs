@@ -252,6 +252,28 @@ namespace ReservationSystem.Controllers
             return RedirectToAction("Settings");
         }
 
+        public ActionResult DeleteUser(string id)
+        {
+            // Delete a user account (e.g. to clean up bot/spam registrations). Guard against
+            // deleting your own account to avoid locking yourself out.
+            if (id == User.Identity.GetUserId())
+            {
+                return RedirectToAction("Settings");
+            }
+
+            using (var appContext = new ApplicationDbContext())
+            {
+                var userStore = new UserStore<ApplicationUser>(appContext);
+                var userManager = new UserManager<ApplicationUser>(userStore);
+                var user = userManager.FindById(id);
+                if (user != null)
+                {
+                    userManager.Delete(user);
+                }
+            }
+            return RedirectToAction("Settings");
+        }
+
         public ActionResult CancelReservation()
         {
             var view = new List<EditReservationView>();

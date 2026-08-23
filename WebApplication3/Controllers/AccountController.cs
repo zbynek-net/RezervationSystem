@@ -191,6 +191,10 @@ namespace ReservationSystem.Controllers
                 if (result.Succeeded)
                 {
                     // Do NOT sign the user in - they stay inactive until an admin approves them.
+                    // Notify the administrator so they can approve/reject the pending account.
+                    var adminUrl = Url.Action("Settings", "Admin", null, Request.Url.Scheme);
+                    _emailController.SendNewRegistrationNotification(user.Name, user.Email, adminUrl);
+
                     logger.Info("Registered user (pending approval): " + model.Email);
                     return View("RegistrationPending");
                 }
