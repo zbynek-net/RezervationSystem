@@ -71,6 +71,19 @@ namespace ReservationSystem.Utils
             SendEmail(email, body, subject);
         }
 
+        public void SendNewRegistrationNotification(string newUserName, string newUserEmail, string adminUrl)
+        {
+            // Notify the administrator that a new account is waiting for approval. The recipient
+            // can be overridden via the "registrationNotificationEmail" appSetting.
+            var to = ConfigurationManager.AppSettings["registrationNotificationEmail"] ?? "jan.cervenka94@seznam.cz";
+            var subject = "Nová registrace čeká na schválení";
+            var body = string.Format(
+                "Nový uživatel se zaregistroval a čeká na schválení:<br/><br/>Jméno: {0}<br/>Email: {1}<br/><br/>Povolit nebo zamítnout ho můžete v administraci: <a href=\"{2}\">{2}</a>",
+                newUserName, newUserEmail, adminUrl);
+
+            SendEmail(to, body, subject);
+        }
+
         private void SendEmail(string mailTo, string body, string subject)
         {
             // SMTP settings default to the original Gmail account but can be overridden in
