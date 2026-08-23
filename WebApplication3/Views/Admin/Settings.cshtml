@@ -1,4 +1,5 @@
 ﻿@using System.Data.Entity.Core.Objects
+@using Microsoft.AspNet.Identity
 @model ReservationSystem.Utils.SettingModelView
 
 @{
@@ -93,6 +94,7 @@
             <th>Aktivní</th>
             <th>Změnit práva</th>
             <th>Povolit/Zakázat</th>
+            <th>Smazat</th>
         </tr>
         @foreach (var item in Model.Users.OrderBy(u => u.IsActive).ThenBy(u => u.LastName))
         {
@@ -105,6 +107,12 @@
                 <td>@(item.IsActive ? "ANO" : "NE")</td>
                 <td>@Html.ActionLink("Změnit", "ChangeAdmin", "Admin", new { id = @item.Id, WasAdmin = @item.IsAdmin }, new { @id = item.Id })</td>
                 <td>@Html.ActionLink(item.IsActive ? "Zakázat" : "Povolit", "ChangeActive", "Admin", new { id = @item.Id, wasActive = @item.IsActive }, null)</td>
+                <td>
+                    @if (item.Id != User.Identity.GetUserId())
+                    {
+                        @Html.ActionLink("Smazat", "DeleteUser", "Admin", new { id = item.Id }, new { onclick = "return confirm('Opravdu smazat tohoto uživatele?');", @class = "text-danger" })
+                    }
+                </td>
             </tr>
         }
     </table>
