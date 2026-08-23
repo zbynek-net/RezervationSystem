@@ -239,6 +239,10 @@ namespace ReservationSystem.Controllers
 
 
                 var reservationModel = repository.Get<ReservationModel, int>(uow, (r => r.Id == id), (r => r.Id)).FirstOrDefault();
+                if (reservationModel == null)
+                {
+                    return RedirectToAction("MainTable", "Home", new { code = new ReturnCode(ReturnCodeLevel.RELOAD, Resource.ReloadOK, null).ToString() });
+                }
                 //is not after deadline
                 if (reservationManager.IsAfterDeadline(uow, reservationModel.Date))
                 {

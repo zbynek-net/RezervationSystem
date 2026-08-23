@@ -81,28 +81,30 @@
 </p>
 
 
-<h2>Nastavit administrátora</h2>
+<h2>Uživatelé</h2>
 <div class="panel panel-default">
     <table class="table table-striped table-hover ">
         <tr>
-            <th>Uživatel</th>
+            <th>Jméno</th>
+            <th>Příjmení</th>
             <th>Email</th>
-            <th>Je administrátor</th>
-            <th>Změnit</th>
+            <th>Telefon</th>
+            <th>Administrátor</th>
+            <th>Aktivní</th>
+            <th>Změnit práva</th>
+            <th>Povolit/Zakázat</th>
         </tr>
-        @foreach (var item in Model.Users)
+        @foreach (var item in Model.Users.OrderBy(u => u.IsActive).ThenBy(u => u.LastName))
         {
-            <tr>
-                <td>@item.Name</td>
-                <td>@item.UserName</td>
-
-                @if (item.IsAdmin)
-                {
-                    <td>ANO</td>}
-                else
-                {
-                    <td>NE</td>}
+            <tr class="@(item.IsActive ? "" : "warning")">
+                <td>@(string.IsNullOrEmpty(item.FirstName) ? item.Name : item.FirstName)</td>
+                <td>@item.LastName</td>
+                <td>@item.Email</td>
+                <td>@item.PhoneNumber</td>
+                <td>@(item.IsAdmin ? "ANO" : "NE")</td>
+                <td>@(item.IsActive ? "ANO" : "NE")</td>
                 <td>@Html.ActionLink("Změnit", "ChangeAdmin", "Admin", new { id = @item.Id, WasAdmin = @item.IsAdmin }, new { @id = item.Id })</td>
+                <td>@Html.ActionLink(item.IsActive ? "Zakázat" : "Povolit", "ChangeActive", "Admin", new { id = @item.Id, wasActive = @item.IsActive }, null)</td>
             </tr>
         }
     </table>

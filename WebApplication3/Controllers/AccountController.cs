@@ -85,6 +85,14 @@ namespace ReservationSystem.Controllers
                 return View(model);
             }
 
+            // Block users that have not been approved by an admin yet (item 2).
+            var existingUser = await UserManager.FindByNameAsync(model.Email);
+            if (existingUser != null && !existingUser.IsActive)
+            {
+                ModelState.AddModelError("", "Váš účet čeká na schválení administrátorem.");
+                return View(model);
+            }
+
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
             var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password + _passwordPostfix, model.RememberMe, shouldLockout: false);
@@ -166,23 +174,25 @@ namespace ReservationSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { Name = model.Name, UserName = model.Email, Email = model.Email };
-                model.ConfirmPassword = model.ConfirmPassword + _passwordPostfix;
-                var result = await UserManager.CreateAsync(user, model.Password+ _passwordPostfix);
+                var fullName = ((model.FirstName ?? string.Empty) + " " + (model.LastName ?? string.Empty)).Trim();
+                var user = new ApplicationUser
+                {
+                    Name = string.IsNullOrWhiteSpace(fullName) ? model.Email : fullName,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    PhoneNumber = model.PhoneNumber,
+                    UserName = model.Email,
+                    Email = model.Email,
+                    EmailConfirmed = true, // approval is handled via IsActive, not e-mail confirmation
+                    IsActive = false       // new users must be approved by an admin before they can log in
+                };
+
+                var result = await UserManager.CreateAsync(user, model.Password + _passwordPostfix);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-
-                    _emailController.SendRegisterEmail(callbackUrl, model.Email);
-
-                    logger.Info("Register user" + model.Email);
-
-                    return View("ConfirmEmailSend");
+                    // Do NOT sign the user in - they stay inactive until an admin approves them.
+                    logger.Info("Registered user (pending approval): " + model.Email);
+                    return View("RegistrationPending");
                 }
                 AddErrors(result);
             }
@@ -222,9 +232,9 @@ namespace ReservationSystem.Controllers
             if (ModelState.IsValid)
             {
                 var user = await UserManager.FindByNameAsync(model.Email);
-                if (user == null || !(await UserManager.IsEmailConfirmedAsync(user.Id)))
+                if (user == null)
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
+                    // Don't reveal that the user does not exist
                     return View("ForgotPasswordConfirmation");
                 }
 

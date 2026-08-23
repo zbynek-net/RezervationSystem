@@ -294,6 +294,10 @@
     <Compile Include="Migrations\201810190948424_AddTimeStampToPickedModel.Designer.cs">
       <DependentUpon>201810190948424_AddTimeStampToPickedModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202608211110561_AddUserContactAndActivation.cs" />
+    <Compile Include="Migrations\202608211110561_AddUserContactAndActivation.Designer.cs">
+      <DependentUpon>202608211110561_AddUserContactAndActivation.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\AppConfiguration.cs" />
     <Compile Include="Models\CancelledDayModel.cs" />
     <Compile Include="Models\DateRangeModel.cs" />
@@ -458,6 +462,7 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
+    <None Include="Web.Local.config.sample" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
@@ -470,6 +475,7 @@
     <Content Include="Views\Account\ForgotPasswordConfirmation.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
+    <Content Include="Views\Account\RegistrationPending.cshtml" />
     <Content Include="Views\Account\ResetPassword.cshtml" />
     <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
     <Content Include="Views\Account\SendCode.cshtml" />
@@ -549,6 +555,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201810190948424_AddTimeStampToPickedModel.resx">
       <DependentUpon>201810190948424_AddTimeStampToPickedModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608211110561_AddUserContactAndActivation.resx">
+      <DependentUpon>202608211110561_AddUserContactAndActivation.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Utils\Resource.resx">
       <Generator>ResXFileCodeGenerator</Generator>

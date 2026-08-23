@@ -21,7 +21,7 @@ namespace ReservationSystem.Reservation
         public DayReservation(bool isCancelled)
         {
             reservations = new Dictionary<int, TableReservation>();
-            _isCancelled = true;
+            _isCancelled = isCancelled;
         }
 
         public bool IsCancelled { get { return this._isCancelled; } }
