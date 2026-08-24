@@ -92,6 +92,7 @@
             <th>Telefon</th>
             <th>Administrátor</th>
             <th>Aktivní</th>
+            <th>Upravit</th>
             <th>Změnit práva</th>
             <th>Povolit/Zakázat</th>
             <th>Smazat</th>
@@ -105,6 +106,7 @@
                 <td>@item.PhoneNumber</td>
                 <td>@(item.IsAdmin ? "ANO" : "NE")</td>
                 <td>@(item.IsActive ? "ANO" : "NE")</td>
+                <td>@Html.ActionLink("Upravit", "EditUser", "Admin", new { id = item.Id }, null)</td>
                 <td>@Html.ActionLink("Změnit", "ChangeAdmin", "Admin", new { id = @item.Id, WasAdmin = @item.IsAdmin }, new { @id = item.Id })</td>
                 <td>@Html.ActionLink(item.IsActive ? "Zakázat" : "Povolit", "ChangeActive", "Admin", new { id = @item.Id, wasActive = @item.IsActive }, null)</td>
                 <td>

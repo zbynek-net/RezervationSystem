@@ -274,6 +274,78 @@ namespace ReservationSystem.Controllers
             return RedirectToAction("Settings");
         }
 
+        [HttpGet]
+        public ActionResult EditUser(string id)
+        {
+            EditUserView view;
+            using (var appContext = new ApplicationDbContext())
+            {
+                var user = appContext.Users.FirstOrDefault(u => u.Id == id);
+                if (user == null)
+                {
+                    return RedirectToAction("Settings");
+                }
+
+                view = new EditUserView
+                {
+                    Id = user.Id,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber
+                };
+            }
+            return View("EditUser", view);
+        }
+
+        [HttpPost]
+        public ActionResult EditUser(EditUserView model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("EditUser", model);
+            }
+
+            using (var appContext = new ApplicationDbContext())
+            {
+                var user = appContext.Users.FirstOrDefault(u => u.Id == model.Id);
+                if (user == null)
+                {
+                    return RedirectToAction("Settings");
+                }
+
+                // Login uses the e-mail as the user name, so if the e-mail changes we must keep
+                // UserName in sync - and guard the unique index against a clash with another user.
+                var newEmail = (model.Email ?? string.Empty).Trim();
+                if (!string.Equals(newEmail, user.Email, StringComparison.OrdinalIgnoreCase))
+                {
+                    var clash = appContext.Users.Any(u => u.Id != user.Id &&
+                        (u.Email == newEmail || u.UserName == newEmail));
+                    if (clash)
+                    {
+                        ModelState.AddModelError("Email", "Uživatel s tímto emailem již existuje.");
+                        return View("EditUser", model);
+                    }
+                    user.Email = newEmail;
+                    user.UserName = newEmail;
+                }
+
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.PhoneNumber = model.PhoneNumber;
+                // Keep the legacy display Name in sync with the structured name fields.
+                var fullName = ((model.FirstName ?? string.Empty) + " " + (model.LastName ?? string.Empty)).Trim();
+                if (!string.IsNullOrEmpty(fullName))
+                {
+                    user.Name = fullName;
+                }
+
+                appContext.SaveChanges();
+            }
+
+            return RedirectToAction("Settings");
+        }
+
         public ActionResult CancelReservation()
         {
             var view = new List<EditReservationView>();

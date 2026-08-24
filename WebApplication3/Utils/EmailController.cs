@@ -75,7 +75,7 @@ namespace ReservationSystem.Utils
         {
             // Notify the administrator that a new account is waiting for approval. The recipient
             // can be overridden via the "registrationNotificationEmail" appSetting.
-            var to = ConfigurationManager.AppSettings["registrationNotificationEmail"] ?? "jan.cervenka94@seznam.cz";
+            var to = ConfigurationManager.AppSettings["registrationNotificationEmail"] ?? "info@jancervenka.cz";
             var subject = "Nová registrace čeká na schválení";
             var body = string.Format(
                 "Nový uživatel se zaregistroval a čeká na schválení:<br/><br/>Jméno: {0}<br/>Email: {1}<br/><br/>Povolit nebo zamítnout ho můžete v administraci: <a href=\"{2}\">{2}</a>",
