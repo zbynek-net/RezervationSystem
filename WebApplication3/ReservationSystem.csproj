@@ -348,6 +348,7 @@
     <Compile Include="Utils\Extensions.cs" />
     <Compile Include="Utils\IoC.cs" />
     <Compile Include="Utils\ITimeManager.cs" />
+    <Compile Include="Utils\EditUserView.cs" />
     <Compile Include="Utils\MyUser.cs" />
     <Compile Include="Utils\Resource.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -491,6 +492,7 @@
     <Content Include="Views\Home\ReservationRules.cshtml" />
     <Content Include="Views\Shared\_ReservationTable.cshtml" />
     <Content Include="Views\Admin\Reports.cshtml" />
+    <Content Include="Views\Admin\EditUser.cshtml" />
     <Content Include="Views\Admin\Settings.cshtml" />
     <Content Include="Views\Reservation\GroupReservations.cshtml" />
     <Content Include="Views\Reservation\EditReservations.cshtml" />
