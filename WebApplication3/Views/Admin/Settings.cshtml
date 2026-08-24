@@ -87,7 +87,6 @@
     <table class="table table-striped table-hover ">
         <tr>
             <th>Jméno</th>
-            <th>Příjmení</th>
             <th>Email</th>
             <th>Telefon</th>
             <th>Administrátor</th>
@@ -97,11 +96,10 @@
             <th>Povolit/Zakázat</th>
             <th>Smazat</th>
         </tr>
-        @foreach (var item in Model.Users.OrderByDescending(u => u.IsAdmin).ThenBy(u => string.IsNullOrEmpty(u.LastName) ? u.Name : u.LastName).ThenBy(u => u.FirstName))
+        @foreach (var item in Model.Users.OrderByDescending(u => u.IsAdmin).ThenBy(u => u.Name))
         {
             <tr class="@(item.IsActive ? "" : "warning")">
-                <td>@(string.IsNullOrEmpty(item.FirstName) ? item.Name : item.FirstName)</td>
-                <td>@item.LastName</td>
+                <td>@item.Name</td>
                 <td>@item.Email</td>
                 <td>@item.PhoneNumber</td>
                 <td>@(item.IsAdmin ? "ANO" : "NE")</td>

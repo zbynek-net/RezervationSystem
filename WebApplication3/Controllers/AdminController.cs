@@ -125,7 +125,7 @@ namespace ReservationSystem.Controllers
                 }
 
                 model.Users = appContext.Users
-                    .Select(u => new { u.Id, u.Email, u.UserName, u.Name, u.FirstName, u.LastName, u.PhoneNumber, u.IsActive })
+                    .Select(u => new { u.Id, u.Email, u.UserName, u.Name, u.PhoneNumber, u.IsActive })
                     .ToList()
                     .Select(u => new MyUser
                     {
@@ -133,8 +133,6 @@ namespace ReservationSystem.Controllers
                         Email = u.Email,
                         UserName = u.UserName,
                         Name = u.Name,
-                        FirstName = u.FirstName,
-                        LastName = u.LastName,
                         PhoneNumber = u.PhoneNumber,
                         IsActive = u.IsActive,
                         IsAdmin = adminUserIds.Contains(u.Id)
@@ -286,20 +284,10 @@ namespace ReservationSystem.Controllers
                     return RedirectToAction("Settings");
                 }
 
-                // Older accounts only have the legacy single Name field (FirstName/LastName are
-                // null), so fall back to it to make sure the form is not shown empty.
-                var firstName = user.FirstName;
-                var lastName = user.LastName;
-                if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
-                {
-                    firstName = user.Name;
-                }
-
                 view = new EditUserView
                 {
                     Id = user.Id,
-                    FirstName = firstName,
-                    LastName = lastName,
+                    Name = user.Name,
                     Email = user.Email,
                     PhoneNumber = user.PhoneNumber
                 };
@@ -324,15 +312,8 @@ namespace ReservationSystem.Controllers
                 }
 
                 // E-mail is intentionally not editable (it is also the login user name).
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
+                user.Name = model.Name;
                 user.PhoneNumber = model.PhoneNumber;
-                // Keep the legacy display Name in sync with the structured name fields.
-                var fullName = ((model.FirstName ?? string.Empty) + " " + (model.LastName ?? string.Empty)).Trim();
-                if (!string.IsNullOrEmpty(fullName))
-                {
-                    user.Name = fullName;
-                }
 
                 appContext.SaveChanges();
             }

@@ -6,11 +6,9 @@ namespace ReservationSystem.Utils
     {
         public string Id { get; set; }
 
+        [Required]
         [Display(Name = "Jméno")]
-        public string FirstName { get; set; }
-
-        [Display(Name = "Příjmení")]
-        public string LastName { get; set; }
+        public string Name { get; set; }
 
         // Display-only: e-mail is also the login user name and is not editable here.
         [Display(Name = "Email")]
