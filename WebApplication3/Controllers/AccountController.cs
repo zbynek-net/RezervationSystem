@@ -174,12 +174,9 @@ namespace ReservationSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                var fullName = ((model.FirstName ?? string.Empty) + " " + (model.LastName ?? string.Empty)).Trim();
                 var user = new ApplicationUser
                 {
-                    Name = string.IsNullOrWhiteSpace(fullName) ? model.Email : fullName,
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
+                    Name = model.Name,
                     PhoneNumber = model.PhoneNumber,
                     UserName = model.Email,
                     Email = model.Email,

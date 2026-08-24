@@ -14,11 +14,6 @@ namespace ReservationSystem.Models
         [Required]
         public string Name { get; set; }
 
-        // Contact details (item 3). Nullable so existing accounts are unaffected until edited.
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
         // PhoneNumber is already provided by IdentityUser.
 
         // Approval flag (item 2): new users start inactive and must be enabled by an admin.
@@ -35,6 +30,14 @@ namespace ReservationSystem.Models
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        static ApplicationDbContext()
+        {
+            // The schema is managed manually via migrations. Disable the model-compatibility
+            // check so unused legacy columns left in the DB (e.g. the old FirstName/LastName)
+            // don't trigger a "model backing the context has changed" error at runtime.
+            Database.SetInitializer<ApplicationDbContext>(null);
+        }
+
         public ApplicationDbContext()
             : base(ConfigurationManager.AppSettings.Get("databaseName"), throwIfV1Schema: false)
         {

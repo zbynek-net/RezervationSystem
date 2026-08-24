@@ -125,7 +125,7 @@ namespace ReservationSystem.Controllers
                 }
 
                 model.Users = appContext.Users
-                    .Select(u => new { u.Id, u.Email, u.UserName, u.Name, u.FirstName, u.LastName, u.PhoneNumber, u.IsActive })
+                    .Select(u => new { u.Id, u.Email, u.UserName, u.Name, u.PhoneNumber, u.IsActive })
                     .ToList()
                     .Select(u => new MyUser
                     {
@@ -133,8 +133,6 @@ namespace ReservationSystem.Controllers
                         Email = u.Email,
                         UserName = u.UserName,
                         Name = u.Name,
-                        FirstName = u.FirstName,
-                        LastName = u.LastName,
                         PhoneNumber = u.PhoneNumber,
                         IsActive = u.IsActive,
                         IsAdmin = adminUserIds.Contains(u.Id)
@@ -289,8 +287,7 @@ namespace ReservationSystem.Controllers
                 view = new EditUserView
                 {
                     Id = user.Id,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
+                    Name = user.Name,
                     Email = user.Email,
                     PhoneNumber = user.PhoneNumber
                 };
@@ -314,31 +311,9 @@ namespace ReservationSystem.Controllers
                     return RedirectToAction("Settings");
                 }
 
-                // Login uses the e-mail as the user name, so if the e-mail changes we must keep
-                // UserName in sync - and guard the unique index against a clash with another user.
-                var newEmail = (model.Email ?? string.Empty).Trim();
-                if (!string.Equals(newEmail, user.Email, StringComparison.OrdinalIgnoreCase))
-                {
-                    var clash = appContext.Users.Any(u => u.Id != user.Id &&
-                        (u.Email == newEmail || u.UserName == newEmail));
-                    if (clash)
-                    {
-                        ModelState.AddModelError("Email", "Uživatel s tímto emailem již existuje.");
-                        return View("EditUser", model);
-                    }
-                    user.Email = newEmail;
-                    user.UserName = newEmail;
-                }
-
-                user.FirstName = model.FirstName;
-                user.LastName = model.LastName;
+                // E-mail is intentionally not editable (it is also the login user name).
+                user.Name = model.Name;
                 user.PhoneNumber = model.PhoneNumber;
-                // Keep the legacy display Name in sync with the structured name fields.
-                var fullName = ((model.FirstName ?? string.Empty) + " " + (model.LastName ?? string.Empty)).Trim();
-                if (!string.IsNullOrEmpty(fullName))
-                {
-                    user.Name = fullName;
-                }
 
                 appContext.SaveChanges();
             }
