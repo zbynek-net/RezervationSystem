@@ -286,11 +286,20 @@ namespace ReservationSystem.Controllers
                     return RedirectToAction("Settings");
                 }
 
+                // Older accounts only have the legacy single Name field (FirstName/LastName are
+                // null), so fall back to it to make sure the form is not shown empty.
+                var firstName = user.FirstName;
+                var lastName = user.LastName;
+                if (string.IsNullOrEmpty(firstName) && string.IsNullOrEmpty(lastName))
+                {
+                    firstName = user.Name;
+                }
+
                 view = new EditUserView
                 {
                     Id = user.Id,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
+                    FirstName = firstName,
+                    LastName = lastName,
                     Email = user.Email,
                     PhoneNumber = user.PhoneNumber
                 };
@@ -314,22 +323,7 @@ namespace ReservationSystem.Controllers
                     return RedirectToAction("Settings");
                 }
 
-                // Login uses the e-mail as the user name, so if the e-mail changes we must keep
-                // UserName in sync - and guard the unique index against a clash with another user.
-                var newEmail = (model.Email ?? string.Empty).Trim();
-                if (!string.Equals(newEmail, user.Email, StringComparison.OrdinalIgnoreCase))
-                {
-                    var clash = appContext.Users.Any(u => u.Id != user.Id &&
-                        (u.Email == newEmail || u.UserName == newEmail));
-                    if (clash)
-                    {
-                        ModelState.AddModelError("Email", "Uživatel s tímto emailem již existuje.");
-                        return View("EditUser", model);
-                    }
-                    user.Email = newEmail;
-                    user.UserName = newEmail;
-                }
-
+                // E-mail is intentionally not editable (it is also the login user name).
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
                 user.PhoneNumber = model.PhoneNumber;

@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ReservationSystem.Utils
 {
@@ -12,8 +12,7 @@ namespace ReservationSystem.Utils
         [Display(Name = "Příjmení")]
         public string LastName { get; set; }
 
-        [Required]
-        [EmailAddress]
+        // Display-only: e-mail is also the login user name and is not editable here.
         [Display(Name = "Email")]
         public string Email { get; set; }
 
